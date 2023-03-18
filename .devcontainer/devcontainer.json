@@ -8,7 +8,8 @@
 			"extensions": [
 				"streetsidesoftware.code-spell-checker",
 				"KishoreIthadi.dotnet-core-essentials",
-				"mhutchie.git-graph"
+				"mhutchie.git-graph",
+				"jcamp.dotnet-test-provider-explorer"
 			]
 		}
 	}
