@@ -7,10 +7,10 @@ namespace BigFileSortingTests;
 public class GeneratorTest
 {
     [Fact]
-    public void CanGenerateEmptyFile()
+    public async Task CanGenerateEmptyFileAsync()
     {
         const string targetFilePath = "./0.lines";
-        FileGenerator.Generate(0, targetFilePath);
+        await FileGenerator.Generate(0, targetFilePath);
 
         File.ReadAllLines(targetFilePath).Count().Should().Be(0);
 
@@ -18,10 +18,10 @@ public class GeneratorTest
     }
 
     [Fact]
-    public void CanGenerateFileWith10ProperLines()
+    public async Task CanGenerateFileWith10ProperLinesAsync()
     {
         const string targetFilePath = "./10.lines";
-        FileGenerator.Generate(10, targetFilePath);
+        await FileGenerator.Generate(10, targetFilePath);
 
         var allLines = File.ReadAllLines(targetFilePath);
         allLines.Count().Should().Be(10);
@@ -31,15 +31,34 @@ public class GeneratorTest
     }
 
 
-    [Fact]
-    public void CanGenerateBigFileWithSomeStringRepetition()
+    [Theory]
+    [InlineData(2000, 200)]
+    [InlineData(1998, 500)]
+    [InlineData(2022, 500)]
+    public async void CanGenerateBigFileInBatchesWithSomeStringRepetition(int howManyLines, int howManyBatches)
     {
-        const string targetFilePath = "./2000.lines";
-        FileGenerator.Generate(2000, targetFilePath);
+        string targetFilePath = @$"./{howManyLines}.lines";
+        await FileGenerator.Generate(howManyLines, targetFilePath, howManyBatches);
 
         var allLines = File.ReadAllLines(targetFilePath);
-        allLines.Count().Should().Be(2000);
+        allLines.Count().Should().Be(howManyLines);
         allLines.Select(x=>x.Split('.')[1]).Distinct().Count().Should().BeLessThan(2000);
+
+        File.Delete(targetFilePath);
+    }
+
+
+    /// This test illustrates that generator can be used to generate
+    /// amount of lines exceeding int.MaxValue by sequential execution
+    [Fact]
+    public async void SequentialExecutionAppendsToFile()
+    {
+        string targetFilePath = "./10.lines";
+        await FileGenerator.Generate(5, targetFilePath);
+        await FileGenerator.Generate(5, targetFilePath);
+
+        var allLines = File.ReadAllLines(targetFilePath);
+        allLines.Count().Should().Be(10);
 
         File.Delete(targetFilePath);
     }
