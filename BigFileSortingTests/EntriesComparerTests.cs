@@ -29,12 +29,13 @@ public class EntriesComparerTests
             (2, "Banana is yellow")
         };
 
-        collection.Order(comparer).Should().ContainInConsecutiveOrder(new[] {
-             (1, "Apple"),
-             (415, "Apple"),
-             (2, "Banana is yellow"),
-             (32, "Cherry is the best"),
-             (30432, "Something something something"),
-             });
+        collection.Order(comparer).Should().HaveCount(5).
+            And.ContainInConsecutiveOrder(new[] {
+                (1, "Apple"),
+                (415, "Apple"),
+                (2, "Banana is yellow"),
+                (32, "Cherry is the best"),
+                (30432, "Something something something"),
+                });
     }
 }
