@@ -26,6 +26,7 @@ if (cliArgs[1] == "sort")
     var workdir = Path.GetDirectoryName(cliArgs[2]);
     stopwatch.Start();
     var partsToMerge = BigFileSplitter.SplitToSortedChunksOfSize(cliArgs[2], workdir, int.Parse(cliArgs[3]));
+    Console.WriteLine($"Done splitting in {stopwatch.Elapsed}");
     PartsMerger.MergePartsSorting(partsToMerge, Path.Combine(workdir, "result.sorted"));
     stopwatch.Stop();
     Console.WriteLine($"Done in {stopwatch.Elapsed}");

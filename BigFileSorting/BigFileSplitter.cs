@@ -40,13 +40,13 @@ public class BigFileSplitter
     private static void flushSorted(IEnumerable<string> buffer, int howManyLines, string targetFilePath)
     {
         IComparer<(int, string)> comparer = new EntriesComparer();
-        var tuples = buffer
+        var lines = buffer
+                        .AsParallel()
                         .Take(howManyLines)
                         .Select(x => x.ToEntry())
-                        .ToList();
-        tuples.Sort(comparer);
-        var lines = tuples.Select(t => t.ToLine());
-
+                        .OrderBy(x=>x, comparer)
+                        .Select(t => t.ToLine());
+                        
         File.WriteAllLines(targetFilePath, lines);
     }
 
