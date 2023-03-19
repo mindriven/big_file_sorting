@@ -17,11 +17,10 @@ public class FileGenerator
         {
             var howManyLinesInThisBatch = Math.Min(howManyLines - batchNumber * batchSize, batchSize);
             var bytes = generateBatchBytes(howManyLinesInThisBatch);
-            using (var targetStream = File.Open(targetFilePath, FileMode.OpenOrCreate))
-            {
-                targetStream.Seek(0, SeekOrigin.End);
-                await targetStream.WriteAsync(bytes, 0, bytes.Length);
-            }
+            using var targetStream = File.Open(targetFilePath, FileMode.OpenOrCreate);
+            targetStream.Seek(0, SeekOrigin.End);
+            await targetStream.WriteAsync(bytes, 0, bytes.Length);
+            
         });
     }
 

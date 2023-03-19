@@ -5,21 +5,20 @@ public class PartsMerger
 {
     private static EntriesComparer comparer = new EntriesComparer();
 
-    private static int writeBufferSize = 10000;
+    private static int writeBufferSize = 100000000;
     public static void MergePartsSorting(IEnumerable<string> partFiles, string writeResultsTo)
     {
         var readers = partFiles.Select(path => new BufferedEntriesReader(path)).ToList();
-        using (var targetStream = File.Open(writeResultsTo, FileMode.OpenOrCreate))
-        using (StreamWriter sw = new StreamWriter(targetStream, Encoding.UTF8, writeBufferSize))
+        using var targetStream = File.Open(writeResultsTo, FileMode.OpenOrCreate);
+        using StreamWriter sw = new StreamWriter(targetStream, Encoding.UTF8, writeBufferSize);
+        
+        while (readers.Any(r => r.HasMoreLines))
         {
-            while (readers.Any(r => r.HasMoreLines))
-            {
-                var readerWithMinValue = readers.Where(r=>r.HasMoreLines).OrderBy(reader => reader.CurrentEntry, comparer).First();
-                sw.WriteLine(readerWithMinValue.CurrentEntry.ToLine());
-                readerWithMinValue.Next();
-            }
+            var readerWithMinValue = readers.Where(r=>r.HasMoreLines).OrderBy(reader => reader.CurrentEntry, comparer).First();
+            sw.WriteLine(readerWithMinValue.CurrentEntry.ToLine());
+            readerWithMinValue.Next();
         }
-
+    
         readers.ForEach(r => r.Dispose());//TODO do disposable collection
     }
 }
