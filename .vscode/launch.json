@@ -10,7 +10,8 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/BigFileSorting/bin/Debug/net7.0/BigFileSorting.dll",
-            "args": [],
+            // "args": ["generate", "./workdir/10M.lines", "10000000"],
+            "args": ["sort", "./workdir/10M.lines", "1000000"],
             "cwd": "${workspaceFolder}/BigFileSorting",
             "console": "internalConsole",
             "stopAtEntry": false
