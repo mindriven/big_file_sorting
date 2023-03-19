@@ -42,7 +42,9 @@ public class BigFileSplitterTests
             "2. Banana is yellow"
         });
 
-        BigFileSplitter.SplitToSortedChunksOfSize(bigFilePath, "./", 3);
+        var result = BigFileSplitter.SplitToSortedChunksOfSize(bigFilePath, "./", 3);
+
+        result.Should().ContainInConsecutiveOrder(new []{"./0_bigFile.lines.part", "./1_bigFile.lines.part"});
 
         File.ReadAllLines("0_bigFile.lines.part").Should().HaveCount(3).And.ContainInConsecutiveOrder(new[]{
             "1. Apple",
@@ -74,7 +76,9 @@ public class BigFileSplitterTests
             "32. Cherry is the best"
         });
 
-        BigFileSplitter.SplitToSortedChunksOfSize(bigFilePath, "./", 2);
+        var result = BigFileSplitter.SplitToSortedChunksOfSize(bigFilePath, "./", 2);
+        
+        result.Should().ContainInConsecutiveOrder(new []{"./0_bigFile.lines.part", "./1_bigFile.lines.part", "./2_bigFile.lines.part"});
 
         File.ReadAllLines("0_bigFile.lines.part").Should().HaveCount(2).And.ContainInConsecutiveOrder(new[]{
             "415. Apple",

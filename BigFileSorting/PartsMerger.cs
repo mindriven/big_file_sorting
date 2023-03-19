@@ -33,8 +33,7 @@ class BufferedEntriesReader : IDisposable
 
     public BufferedEntriesReader(string path)
     {
-
-        stream = File.Open(path, FileMode.OpenOrCreate);
+        stream = File.Open(path, FileMode.Open);
         reader = new StreamReader(stream);
         this.Next();
     }
@@ -45,9 +44,7 @@ class BufferedEntriesReader : IDisposable
         stream.Dispose();
     }
 
-    internal bool HasMoreLines { get; private set;}
-
-    // private bool allLinesIterated = false;
+    internal bool HasMoreLines { get; private set;} = true;
 
     internal void Next()
     {
@@ -55,7 +52,7 @@ class BufferedEntriesReader : IDisposable
         if (line == null) this.HasMoreLines = false;
         else
         {
-            var split = line.ToEntry();
+            this.CurrentEntry = line.ToEntry();
         }
 
     }

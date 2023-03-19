@@ -34,5 +34,10 @@ public class PartsMergerTests
             "32. Cherry is the best",
             "30432. Something something something"
         });
+
+        File.Delete("0_bigFile.lines.part");
+        File.Delete("1_bigFile.lines.part");
+        File.Delete("2_bigFile.lines.part");
+        File.Delete("bigFile.lines.sorted");
     }
 }

@@ -1,10 +1,12 @@
 public class BigFileSplitter
 {
-    // static IComparer() comparer = new EntriesComparer();
-
-    public static void SplitToSortedChunksOfSize(string sourcefilePath, string workDirPath, int howManyLinesPerFile = 1000)
+    /// <summary>
+    /// Splits input file into multiple smaller, sorted files. Returns paths to created .part files
+    /// </summary>
+    public static IEnumerable<string> SplitToSortedChunksOfSize(string sourcefilePath, string workDirPath, int howManyLinesPerFile = 1000)
     {
-        // TODO path validate parameters
+        List<string> result = new List<string>();
+        // TODO validate path parameters
         // TODO refactor to reactive with File.ReadLinesAsync(sourcefilePath) and https://www.nuget.org/packages/System.Linq.Async
         var buffer = new string[howManyLinesPerFile];
         using (var sourceStream = File.Open(sourcefilePath, FileMode.Open))
@@ -18,14 +20,21 @@ public class BigFileSplitter
                 linesCounter++;
                 if (linesCounter == howManyLinesPerFile)
                 {
-                    flushSorted(buffer, howManyLinesPerFile, getPartFileName(workDirPath, flashesCounter, sourcefilePath));
+                    var partFileName = getPartFileName(workDirPath, flashesCounter, sourcefilePath);
+                    flushSorted(buffer, howManyLinesPerFile, partFileName);
                     flashesCounter++;
                     linesCounter = 0;
+                    result.Add(partFileName);
                 }
             }
             if (linesCounter > 0)
-                flushSorted(buffer, linesCounter, getPartFileName(workDirPath, flashesCounter, sourcefilePath));
+            {
+                var partFileName = getPartFileName(workDirPath, flashesCounter, sourcefilePath);
+                flushSorted(buffer, linesCounter, partFileName);
+                result.Add(partFileName);
+            }
         }
+        return result;
     }
 
     private static void flushSorted(IEnumerable<string> buffer, int howManyLines, string targetFilePath)
@@ -33,11 +42,11 @@ public class BigFileSplitter
         IComparer<(int, string)> comparer = new EntriesComparer();
         var tuples = buffer
                         .Take(howManyLines)
-                        .Select(x=>x.ToEntry())
+                        .Select(x => x.ToEntry())
                         .ToList();
         tuples.Sort(comparer);
-        var lines = tuples.Select(t=>t.ToLine());
-        
+        var lines = tuples.Select(t => t.ToLine());
+
         File.WriteAllLines(targetFilePath, lines);
     }
 
