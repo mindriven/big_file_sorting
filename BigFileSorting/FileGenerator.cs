@@ -13,7 +13,7 @@ public class FileGenerator
         var howManyBatches = howManyLines / batchSize;
         //performance choice was to do it in parallel or async. Since writing to disk is much slower
         //than generation, chosen await
-        await Enumerable.Range(0, howManyBatches+1).ToList().ForEachAsync(async batchNumber =>
+        await Enumerable.Range(0, howManyBatches + 1).ToList().ForEachAsync(async batchNumber =>
         {
             var howManyLinesInThisBatch = Math.Min(howManyLines - batchNumber * batchSize, batchSize);
             var bytes = generateBatchBytes(howManyLinesInThisBatch);
@@ -35,15 +35,4 @@ public class FileGenerator
                          .ToArray();
         return bytes;
     }
-}
-
-internal static class Extensions{
-    public static async Task ForEachAsync<T>(this List<T> list, Func<T, Task> func)
-    {
-        foreach (var value in list)
-        {
-            await func(value);
-        }
-    }
-
 }

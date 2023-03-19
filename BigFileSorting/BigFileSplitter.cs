@@ -14,32 +14,29 @@ public class BigFileSplitter
             var flashesCounter = 0;
             while (!reader.EndOfStream)
             {
-                buffer[linesCounter] = reader.ReadLine();
+                buffer[linesCounter] = reader.ReadLine()!;
                 linesCounter++;
                 if (linesCounter == howManyLinesPerFile)
                 {
-                    flashSorted(buffer, howManyLinesPerFile, getPartFileName(workDirPath, flashesCounter, sourcefilePath));
+                    flushSorted(buffer, howManyLinesPerFile, getPartFileName(workDirPath, flashesCounter, sourcefilePath));
                     flashesCounter++;
                     linesCounter = 0;
                 }
             }
             if (linesCounter > 0)
-                flashSorted(buffer, linesCounter, getPartFileName(workDirPath, flashesCounter, sourcefilePath));
+                flushSorted(buffer, linesCounter, getPartFileName(workDirPath, flashesCounter, sourcefilePath));
         }
     }
 
-    private static void flashSorted(IEnumerable<string> buffer, int howManyLines, string targetFilePath)
+    private static void flushSorted(IEnumerable<string> buffer, int howManyLines, string targetFilePath)
     {
-        //TODO extract tuple <=> string conversion somewhere, it's going to be done multiple times
         IComparer<(int, string)> comparer = new EntriesComparer();
         var tuples = buffer
                         .Take(howManyLines)
-                        .Select(x=>{
-                            var splitResult = x.Split('.');
-                            return (int.Parse(splitResult[0]), splitResult[1]);
-                        }).ToList();
+                        .Select(x=>x.ToEntry())
+                        .ToList();
         tuples.Sort(comparer);
-        var lines = tuples.Select(t=>t.Item1+"."+t.Item2);
+        var lines = tuples.Select(t=>t.ToLine());
         
         File.WriteAllLines(targetFilePath, lines);
     }
